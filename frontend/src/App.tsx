@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from 'react-oidc-context';
 import { Header } from '@/components/layout/Header';
+import { RequireAuth } from '@/components/auth/RequireAuth';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { EventListPage } from '@/pages/events/EventListPage';
 import { EventFormPage } from '@/pages/events/EventFormPage';
@@ -16,13 +17,16 @@ function App() {
       <BrowserRouter>
         <Header />
         <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/events" element={<EventListPage />} />
-          <Route path="/events/new" element={<EventFormPage />} />
-          <Route path="/events/:id/edit" element={<EventFormPage />} />
-          <Route path="/org" element={<OrgSettingsPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          {/* Public route: OAuth callback */}
           <Route path="/callback" element={<CallbackPage />} />
+
+          {/* Protected routes: require authentication */}
+          <Route path="/" element={<RequireAuth><DashboardPage /></RequireAuth>} />
+          <Route path="/events" element={<RequireAuth><EventListPage /></RequireAuth>} />
+          <Route path="/events/new" element={<RequireAuth><EventFormPage /></RequireAuth>} />
+          <Route path="/events/:id/edit" element={<RequireAuth><EventFormPage /></RequireAuth>} />
+          <Route path="/org" element={<RequireAuth><OrgSettingsPage /></RequireAuth>} />
+          <Route path="/admin" element={<RequireAuth><AdminDashboard /></RequireAuth>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
