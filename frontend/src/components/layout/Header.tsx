@@ -1,12 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
 
 export function Header() {
   const { t, i18n } = useTranslation();
   const auth = useAuth();
-  const navigate = useNavigate();
+  
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);

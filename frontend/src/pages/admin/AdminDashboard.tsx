@@ -7,7 +7,6 @@ import {
   Table,
   Button,
   Badge,
-  Card,
 } from 'react-bootstrap';
 import { adminApi } from '@/services/api';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
