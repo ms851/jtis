@@ -20,12 +20,13 @@
 11. [Modul 6: Finanz-Controlling](#11-modul-6-finanz-controlling)
 12. [Modul 7: Hotel-/Unterkunftsmanagement](#12-modul-7-hotel-unterkunftsmanagement)
 13. [Organisations-Einstellungen (Tenant-Ebene)](#13-organisations-einstellungen-tenant-ebene)
-14. [Tech-Stack](#14-tech-stack)
-15. [Integrationen](#15-integrationen)
-16. [Internationalisierung](#16-internationalisierung)
-17. [Datenschutz (DSGVO)](#17-datenschutz-dsgvo)
-18. [Datenmodell-Entwürfe](#18-datenmodell-entwürfe)
-19. [MVP-Roadmap](#19-mvp-roadmap)
+14. [SaaS-Administration](#14-saas-administration)
+15. [Tech-Stack](#15-tech-stack)
+16. [Integrationen](#16-integrationen)
+17. [Internationalisierung](#17-internationalisierung)
+18. [Datenschutz (DSGVO)](#18-datenschutz-dsgvo)
+19. [Datenmodell-Entwürfe](#19-datenmodell-entwürfe)
+20. [MVP-Roadmap](#20-mvp-roadmap)
 
 ---
 
@@ -112,6 +113,7 @@ JTIS setzt auf **Role-Based Access Control (RBAC)** mit modulspezifischer Granul
 
 | Zielgruppe | Zugriff | Login erforderlich |
 |---|---|---|
+| **SaaS-Admin** | **Alle Tenants, Abonnement-Verwaltung, Impersonation, System-Konfiguration** | **✅** |
 | Plattform-Admin | Alle Tenants, System-Konfiguration | ✅ |
 | Organisations-Admin | Alle Events einer Organisation, Org-Einstellungen | ✅ |
 | Event-Leitung | Alle Module eines Events | ✅ |
@@ -555,7 +557,62 @@ Zentrale Konfiguration, die für **alle Events einer Organisation** gilt. Wieder
 
 ---
 
-## 14. Tech-Stack
+## 14. SaaS-Administration
+
+### Zweck
+
+Die SaaS-Administration ist die **plattformweite Verwaltungsebene** für den Betreiber (SaaS-Admin). Sie steht oberhalb der Organisations-Ebene und ermöglicht die zentrale Steuerung aller Tenants, Abonnements und Support-Funktionen.
+
+### 14.1 Organisations- & Abonnement-Verwaltung
+
+| Bereich | Beschreibung |
+|---|---|
+| Tenant-Übersicht | Liste aller Organisationen mit Status, Plan, Nutzungsstatistiken |
+| Tenant anlegen/bearbeiten | Neue Organisationen manuell anlegen, Stammdaten pflegen |
+| Tenant sperren/deaktivieren | Organisation temporär sperren oder dauerhaft deaktivieren |
+| Abonnement-Verwaltung | Tarif zuweisen/ändern, Laufzeiten, Kündigungen verwalten |
+| Tarifmodelle | SaaS-Pläne definieren (z.B. Basic, Pro, Enterprise) |
+| Feature-Flags | Module pro Tarif ein-/ausschaltbar (z.B. Transport nur ab Pro) |
+| Nutzungslimits | Limits pro Plan definieren (z.B. max. Events, max. Helfer, Speicher) |
+| Zahlungsübersicht | Zahlungsstatus, offene Rechnungen, Zahlungshistorie (via Payment-Provider) |
+| Audit-Log | Plattformweites Protokoll aller administrativen Aktionen |
+
+### 14.2 Impersonation (Support-Zugang)
+
+Der SaaS-Admin kann sich **als beliebiger Benutzer einer Organisation einloggen**, um Support zu leisten, ohne dessen Passwort zu kennen.
+
+#### Funktionsweise
+
+- **Impersonation starten:** Admin wählt Organisation → Benutzer → "Als Benutzer anmelden"
+- **Session:** Es wird eine separate, gekennzeichnete Session erstellt
+- **Sichtbare Markierung:** Im Frontend ist durchgehend ein **Banner/Badge** sichtbar, das die aktive Impersonation anzeigt (z.B. "⚠️ Support-Zugang als [Benutzername] in [Organisation]")
+- **Berechtigungen:** Admin erhält exakt die Rechte des impersonierten Benutzers — nicht mehr, nicht weniger
+- **Impersonation beenden:** Jederzeit per Klick zurück zum Admin-Bereich
+
+#### Sicherheit & Compliance
+
+| Aspekt | Umsetzung |
+|---|---|
+| Audit-Logging | Jede Impersonation wird protokolliert (wer, wann, welcher User, Dauer) |
+| Aktions-Logging | Alle Aktionen während Impersonation werden als "impersonated" markiert |
+| Zeitlimit | Impersonation-Sessions laufen nach konfigurierbarer Zeit automatisch ab |
+| Benachrichtigung | Optional: Organisations-Admin wird über Impersonation informiert |
+| Einschränkungen | Kein Zugriff auf Passwort-Änderung oder Keycloak-Credentials des Users |
+| DSGVO | Impersonation ist dokumentiert und nachvollziehbar (Art. 5 Abs. 2 DSGVO) |
+
+#### Technische Umsetzung (Keycloak)
+
+Keycloak unterstützt **Token Exchange** (RFC 8693) für Impersonation nativ:
+
+1. Admin authentifiziert sich mit eigenem Keycloak-Account
+2. Admin fordert ein **impersonated Token** für den Ziel-Benutzer an
+3. Das Token enthält einen `impersonator`-Claim mit der Admin-ID
+4. Backend prüft bei jedem Request: ist `impersonator` gesetzt → Audit-Logging aktivieren
+5. Frontend erkennt den Claim → zeigt Impersonation-Banner
+
+---
+
+## 15. Tech-Stack
 
 ### Übersicht
 
@@ -610,7 +667,7 @@ Zentrale Konfiguration, die für **alle Events einer Organisation** gilt. Wieder
 
 ---
 
-## 15. Integrationen
+## 16. Integrationen
 
 ### Geplante Integrationen
 
@@ -631,7 +688,7 @@ Zentrale Konfiguration, die für **alle Events einer Organisation** gilt. Wieder
 
 ---
 
-## 16. Internationalisierung
+## 17. Internationalisierung
 
 ### Mehrsprachigkeit (i18n)
 
@@ -655,7 +712,7 @@ Zentrale Konfiguration, die für **alle Events einer Organisation** gilt. Wieder
 
 ---
 
-## 17. Datenschutz (DSGVO)
+## 18. Datenschutz (DSGVO)
 
 ### Anforderungen
 
@@ -680,7 +737,7 @@ Zentrale Konfiguration, die für **alle Events einer Organisation** gilt. Wieder
 
 ---
 
-## 18. Datenmodell-Entwürfe
+## 19. Datenmodell-Entwürfe
 
 ### Übergreifende Konventionen
 
@@ -704,9 +761,56 @@ Zentrale Konfiguration, die für **alle Events einer Organisation** gilt. Wieder
 | `logo_url` | TEXT | Logo-URL |
 | `contact_email` | VARCHAR(255) | Kontakt-E-Mail |
 | `settings` | JSONB | Org-weite Einstellungen |
-| `subscription_plan` | VARCHAR(50) | SaaS-Tarif |
+| `subscription_plan_id` | UUID FK → subscription_plans | Aktiver SaaS-Tarif |
+| `subscription_status` | VARCHAR(20) | `trial`, `active`, `suspended`, `cancelled` |
+| `subscription_valid_until` | TIMESTAMPTZ | Laufzeit-Ende |
+| `is_suspended` | BOOLEAN | Organisation gesperrt |
+| `suspended_reason` | TEXT | Grund der Sperrung |
 | `created_at` | TIMESTAMPTZ | Erstellungsdatum |
 | `updated_at` | TIMESTAMPTZ | Letzte Änderung |
+
+#### `subscription_plans` — SaaS-Tarifmodelle
+
+| Spalte | Typ | Beschreibung |
+|---|---|---|
+| `id` | UUID PK | Plan-ID |
+| `name` | VARCHAR(100) | Planname (z.B. Basic, Pro, Enterprise) |
+| `slug` | VARCHAR(50) UNIQUE | URL-Bezeichner |
+| `price_monthly` | DECIMAL(10,2) | Monatspreis in EUR |
+| `price_yearly` | DECIMAL(10,2) | Jahrespreis in EUR |
+| `max_events` | INTEGER | Max. gleichzeitige Events (NULL = unbegrenzt) |
+| `max_helpers` | INTEGER | Max. Helfer pro Event (NULL = unbegrenzt) |
+| `max_storage_mb` | INTEGER | Max. Speicher in MB |
+| `enabled_modules` | JSONB | Liste der freigeschalteten Module |
+| `is_active` | BOOLEAN | Plan buchbar |
+| `created_at` | TIMESTAMPTZ | Erstellungsdatum |
+
+#### `impersonation_log` — Impersonation-Protokoll
+
+| Spalte | Typ | Beschreibung |
+|---|---|---|
+| `id` | UUID PK | Log-ID |
+| `admin_user_id` | UUID FK → users | SaaS-Admin der impersoniert |
+| `target_user_id` | UUID FK → users | Impersonierter Benutzer |
+| `tenant_id` | UUID FK → organizations | Betroffene Organisation |
+| `started_at` | TIMESTAMPTZ | Beginn der Impersonation |
+| `ended_at` | TIMESTAMPTZ | Ende (NULL = noch aktiv) |
+| `reason` | TEXT | Grund/Support-Ticket-Referenz |
+| `actions_count` | INTEGER | Anzahl Aktionen während Session |
+
+#### `platform_audit_log` — Plattform-Audit-Log
+
+| Spalte | Typ | Beschreibung |
+|---|---|---|
+| `id` | UUID PK | Log-ID |
+| `actor_user_id` | UUID FK → users | Ausführender Admin |
+| `action` | VARCHAR(100) | Aktion (z.B. `tenant.suspend`, `impersonation.start`) |
+| `target_type` | VARCHAR(50) | Zieltyp (`organization`, `user`, `subscription`) |
+| `target_id` | UUID | Ziel-ID |
+| `details` | JSONB | Zusätzliche Details |
+| `ip_address` | INET | IP-Adresse |
+| `is_impersonated` | BOOLEAN | Während Impersonation ausgeführt |
+| `created_at` | TIMESTAMPTZ | Zeitstempel |
 
 #### `users` — Benutzer (plattformweit)
 
@@ -1290,7 +1394,7 @@ organizations ──1:n──▶ events
 
 ---
 
-## 19. MVP-Roadmap
+## 20. MVP-Roadmap
 
 ### Phase 1: Core + Event-Einstellungen + Auth
 
@@ -1302,9 +1406,11 @@ organizations ──1:n──▶ events
 | Auth (Keycloak) | Login, Registrierung, RBAC-Grundstruktur |
 | Event-Einstellungen (Modul 0) | Event anlegen, konfigurieren, Module aktivieren |
 | Org-Einstellungen | Stammdaten, Benutzer-Verwaltung |
+| **SaaS-Administration** | **Tenant-Übersicht, Abonnement-Verwaltung, Tarif-Management** |
+| **Impersonation** | **Support-Zugang via Keycloak Token Exchange, Audit-Logging** |
 | Tech-Basis | Docker Compose, CI/CD, API-Grundstruktur |
 
-**Ergebnis:** Man kann sich einloggen, eine Organisation anlegen, ein Event erstellen und Module aktivieren.
+**Ergebnis:** Man kann sich einloggen, eine Organisation anlegen, ein Event erstellen und Module aktivieren. Der SaaS-Admin kann Organisationen verwalten, Abonnements steuern und sich für Support in beliebige Benutzer-Accounts einloggen.
 
 ---
 
