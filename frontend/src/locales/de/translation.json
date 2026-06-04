@@ -1,0 +1,82 @@
+{
+  "app": {
+    "title": "JTIS",
+    "subtitle": "Judo Tournament Information System"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "events": "Veranstaltungen",
+    "org": "Organisation",
+    "admin": "Administration",
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "language": "Sprache"
+  },
+  "events": {
+    "title": "Veranstaltungen",
+    "create": "Neue Veranstaltung",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "name": "Name",
+    "description": "Beschreibung",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum",
+    "timezone": "Zeitzone",
+    "status": "Status",
+    "modules": "Module",
+    "noEvents": "Keine Veranstaltungen vorhanden.",
+    "statuses": {
+      "draft": "Entwurf",
+      "active": "Aktiv",
+      "completed": "Abgeschlossen",
+      "archived": "Archiviert"
+    }
+  },
+  "org": {
+    "title": "Organisations-Einstellungen",
+    "name": "Name",
+    "email": "Kontakt-E-Mail",
+    "members": "Mitglieder",
+    "inviteMember": "Mitglied einladen",
+    "role": "Rolle",
+    "settings": "Einstellungen",
+    "save": "Speichern"
+  },
+  "admin": {
+    "title": "SaaS-Administration",
+    "tenants": "Organisationen",
+    "plans": "Tarifmodelle",
+    "auditLog": "Audit-Log",
+    "createTenant": "Organisation anlegen",
+    "suspend": "Sperren",
+    "unsuspend": "Entsperren",
+    "impersonate": "Als Benutzer anmelden",
+    "impersonation": {
+      "banner": "⚠️ Support-Zugang als {{user}} in {{org}}",
+      "end": "Zurück zum Admin"
+    }
+  },
+  "auth": {
+    "loginRequired": "Bitte melden Sie sich an.",
+    "accessDenied": "Zugriff verweigert."
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "loading": "Laden...",
+    "error": "Ein Fehler ist aufgetreten.",
+    "confirm": "Bestätigen",
+    "back": "Zurück",
+    "search": "Suchen",
+    "noData": "Keine Daten vorhanden.",
+    "actions": "Aktionen"
+  },
+  "gdpr": {
+    "dataExport": "Meine Daten exportieren",
+    "consents": "Einwilligungen",
+    "deleteAccount": "Konto löschen"
+  }
+}

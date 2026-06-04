@@ -1,0 +1,82 @@
+{
+  "app": {
+    "title": "JTIS",
+    "subtitle": "Judo Tournament Information System"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "events": "Events",
+    "org": "Organization",
+    "admin": "Administration",
+    "login": "Login",
+    "logout": "Logout",
+    "language": "Language"
+  },
+  "events": {
+    "title": "Events",
+    "create": "New Event",
+    "edit": "Edit",
+    "delete": "Delete",
+    "name": "Name",
+    "description": "Description",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "timezone": "Timezone",
+    "status": "Status",
+    "modules": "Modules",
+    "noEvents": "No events found.",
+    "statuses": {
+      "draft": "Draft",
+      "active": "Active",
+      "completed": "Completed",
+      "archived": "Archived"
+    }
+  },
+  "org": {
+    "title": "Organization Settings",
+    "name": "Name",
+    "email": "Contact Email",
+    "members": "Members",
+    "inviteMember": "Invite Member",
+    "role": "Role",
+    "settings": "Settings",
+    "save": "Save"
+  },
+  "admin": {
+    "title": "SaaS Administration",
+    "tenants": "Organizations",
+    "plans": "Subscription Plans",
+    "auditLog": "Audit Log",
+    "createTenant": "Create Organization",
+    "suspend": "Suspend",
+    "unsuspend": "Unsuspend",
+    "impersonate": "Log in as User",
+    "impersonation": {
+      "banner": "⚠️ Support access as {{user}} in {{org}}",
+      "end": "Back to Admin"
+    }
+  },
+  "auth": {
+    "loginRequired": "Please log in.",
+    "accessDenied": "Access denied."
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "loading": "Loading...",
+    "error": "An error occurred.",
+    "confirm": "Confirm",
+    "back": "Back",
+    "search": "Search",
+    "noData": "No data available.",
+    "actions": "Actions"
+  },
+  "gdpr": {
+    "dataExport": "Export my data",
+    "consents": "Consents",
+    "deleteAccount": "Delete Account"
+  }
+}
