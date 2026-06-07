@@ -75,6 +75,24 @@ async def decode_token(token: str) -> dict:
             issuer=f"{settings.keycloak_url}/realms/{settings.keycloak_realm}",
             options={"verify_aud": True, "verify_iss": True},
         )
+    except JWTError:
+        # Fallback: accept token with 'account' audience (Keycloak default)
+        try:
+            payload = jwt.decode(
+                token,
+                key,
+                algorithms=["RS256"],
+                audience="account",
+                issuer=f"{settings.keycloak_url}/realms/{settings.keycloak_realm}",
+                options={"verify_aud": True, "verify_iss": True},
+            )
+        except JWTError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Token validation failed: {exc}",
+            ) from exc
+        else:
+            return payload
     except JWTError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
