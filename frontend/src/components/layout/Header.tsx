@@ -73,7 +73,7 @@ export function Header() {
             </NavDropdown.Item>
           </NavDropdown>
           {auth.isAuthenticated ? (
-            <Nav.Link onClick={() => auth.removeUser()} className="ms-2">
+            <Nav.Link onClick={() => auth.signoutRedirect()} className="ms-2">
               {t('nav.logout')} ({auth.user?.profile?.preferred_username})
             </Nav.Link>
           ) : (
