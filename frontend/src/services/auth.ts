@@ -13,4 +13,29 @@ export const oidcConfig = {
   scope: 'openid profile email',
   automaticSilentRenew: true,
   userStore: new WebStorageStateStore({ store: window.localStorage }),
+  onSigninCallback: () => {
+    // Remove OIDC query params after successful login
+    window.history.replaceState({}, document.title, window.location.pathname);
+  },
 };
+
+/**
+ * Manual login redirect as fallback when oidc-client-ts signinRedirect fails.
+ * Builds the authorization URL directly.
+ */
+export function manualLoginRedirect() {
+  const state = crypto.randomUUID();
+  const nonce = crypto.randomUUID();
+  sessionStorage.setItem('oidc_state', state);
+
+  const params = new URLSearchParams({
+    client_id: KEYCLOAK_CLIENT_ID,
+    redirect_uri: `${window.location.origin}/callback`,
+    response_type: 'code',
+    scope: 'openid profile email',
+    state,
+    nonce,
+  });
+
+  window.location.href = `${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/auth?${params}`;
+}

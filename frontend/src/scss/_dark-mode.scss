@@ -1,0 +1,17 @@
+[data-theme="dark"] {
+  --color-primary: #EF5350;
+  --color-primary-light: #FF8A80;
+  --color-secondary: #66BB6A;
+  --color-secondary-light: #A5D6A7;
+  --color-bg: #121212;
+  --color-surface: #1E1E1E;
+  --color-text-primary: #E0E0E0;
+  --color-text-secondary: #BDBDBD;
+  --color-border: #333333;
+  --color-highlight: #2C2410;
+}
+
+[data-theme="dark"] body::before {
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="%23181818"/><path d="M0 0L40 40" stroke="%23333" stroke-width="0.5"/></svg>') repeat;
+  opacity: 0.06;
+}
