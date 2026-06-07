@@ -99,13 +99,6 @@ async def decode_token(token: str) -> dict:
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail=f"Token validation failed: {last_error}",
     )
-    except JWTError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Token validation failed: {exc}",
-        ) from exc
-
-    return payload
 
 
 class CurrentUser:
