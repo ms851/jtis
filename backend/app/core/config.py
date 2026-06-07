@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     keycloak_realm: str = "jtis"
     keycloak_client_id: str = "jtis-backend"
     keycloak_client_secret: str = "change-me"
+    keycloak_hostname: str = ""  # External hostname e.g. 87.106.31.213:8080
 
     # Redis
     redis_url: str = "redis://redis:6379/0"

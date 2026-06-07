@@ -66,33 +66,39 @@ async def decode_token(token: str) -> dict:
             detail="Unable to find matching key",
         )
 
-    try:
-        payload = jwt.decode(
-            token,
-            key,
-            algorithms=["RS256"],
-            audience=settings.keycloak_client_id,
-            issuer=f"{settings.keycloak_url}/realms/{settings.keycloak_realm}",
-            options={"verify_aud": True, "verify_iss": True},
+    # Build list of accepted issuers (internal Docker URL + external hostname)
+    accepted_issuers = [
+        f"{settings.keycloak_url}/realms/{settings.keycloak_realm}",
+    ]
+    if hasattr(settings, 'keycloak_hostname') and settings.keycloak_hostname:
+        accepted_issuers.append(
+            f"http://{settings.keycloak_hostname}/realms/{settings.keycloak_realm}"
         )
-    except JWTError:
-        # Fallback: accept token with 'account' audience (Keycloak default)
-        try:
-            payload = jwt.decode(
-                token,
-                key,
-                algorithms=["RS256"],
-                audience="account",
-                issuer=f"{settings.keycloak_url}/realms/{settings.keycloak_realm}",
-                options={"verify_aud": True, "verify_iss": True},
-            )
-        except JWTError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Token validation failed: {exc}",
-            ) from exc
-        else:
-            return payload
+
+    # Build list of accepted audiences
+    accepted_audiences = [settings.keycloak_client_id, "account"]
+
+    last_error = None
+    for issuer in accepted_issuers:
+        for audience in accepted_audiences:
+            try:
+                payload = jwt.decode(
+                    token,
+                    key,
+                    algorithms=["RS256"],
+                    audience=audience,
+                    issuer=issuer,
+                    options={"verify_aud": True, "verify_iss": True},
+                )
+                return payload
+            except JWTError as exc:
+                last_error = exc
+                continue
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=f"Token validation failed: {last_error}",
+    )
     except JWTError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
