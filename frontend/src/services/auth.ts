@@ -23,9 +23,15 @@ export const oidcConfig = {
  * Manual login redirect as fallback when oidc-client-ts signinRedirect fails.
  * Builds the authorization URL directly.
  */
+function generateId(): string {
+  const arr = new Uint8Array(16);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
+}
+
 export function manualLoginRedirect() {
-  const state = crypto.randomUUID();
-  const nonce = crypto.randomUUID();
+  const state = generateId();
+  const nonce = generateId();
   sessionStorage.setItem('oidc_state', state);
 
   const params = new URLSearchParams({
