@@ -10,12 +10,14 @@ import { EventFormPage } from '@/pages/events/EventFormPage';
 import { OrgSettingsPage } from '@/pages/org/OrgSettingsPage';
 import { AdminDashboard } from '@/pages/admin/AdminDashboard';
 import { CallbackPage } from '@/pages/auth/CallbackPage';
+import { AuthTokenSync } from '@/components/auth/AuthTokenSync';
 import { oidcConfig } from '@/services/auth';
 import '@/scss/main.scss';
 
 function App() {
   return (
     <AuthProvider {...oidcConfig}>
+      <AuthTokenSync />
       <BrowserRouter>
         <SidebarProvider>
           <Header />
