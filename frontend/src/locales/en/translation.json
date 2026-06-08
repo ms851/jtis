@@ -30,7 +30,10 @@
       "active": "Active",
       "completed": "Completed",
       "archived": "Archived"
-    }
+    },
+    "activate": "Activate",
+    "complete": "Complete",
+    "archive": "Archive"
   },
   "org": {
     "title": "Organization Settings",

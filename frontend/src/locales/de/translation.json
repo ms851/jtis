@@ -30,7 +30,10 @@
       "active": "Aktiv",
       "completed": "Abgeschlossen",
       "archived": "Archiviert"
-    }
+    },
+    "activate": "Freigeben",
+    "complete": "Abschließen",
+    "archive": "Archivieren"
   },
   "org": {
     "title": "Organisations-Einstellungen",
