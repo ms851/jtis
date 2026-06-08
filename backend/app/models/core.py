@@ -135,8 +135,6 @@ class OrganizationMember(BaseModel, TenantMixin):
 
     organization: Mapped[Organization] = relationship(
         back_populates="members",
-        foreign_keys=[TenantMixin.tenant_id],
-        primaryjoin="OrganizationMember.tenant_id == Organization.id",
     )
     user: Mapped[User] = relationship(back_populates="memberships")
 

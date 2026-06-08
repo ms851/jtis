@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Uuid, func
+from sqlalchemy import DateTime, ForeignKey, Uuid, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -46,6 +46,7 @@ class TenantMixin:
 
     tenant_id: Mapped[uuid.UUID] = mapped_column(
         Uuid,
+        ForeignKey("organizations.id"),
         nullable=False,
         index=True,
     )
