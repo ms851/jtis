@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+import uuid
+
 import httpx
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.core.database import current_tenant_id
+from app.core.database import current_tenant_id, get_db
 
 settings = get_settings()
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -161,9 +165,29 @@ class CurrentUser:
         return self.impersonator is not None
 
 
+async def _ensure_local_user(
+    db: AsyncSession, keycloak_id: str, email: str, display_name: str | None
+) -> None:
+    """Auto-provision a local User record for Keycloak users on first API call."""
+    from app.models.core import User  # avoid circular import
+
+    uid = uuid.UUID(keycloak_id)
+    result = await db.execute(select(User).where(User.keycloak_id == uid))
+    if result.scalar_one_or_none() is None:
+        local_user = User(
+            id=uid,
+            keycloak_id=uid,
+            email=email or f"{keycloak_id}@keycloak.local",
+            display_name=display_name,
+        )
+        db.add(local_user)
+        await db.flush()
+
+
 async def get_current_user(
     request: Request,
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    db: AsyncSession = Depends(get_db),
 ) -> CurrentUser:
     if credentials is None:
         raise HTTPException(
@@ -172,6 +196,10 @@ async def get_current_user(
         )
     payload = await decode_token(credentials.credentials)
     user = CurrentUser(payload)
+
+    # Auto-provision local user record
+    if user.id:
+        await _ensure_local_user(db, user.id, user.email, user.display_name)
 
     # Set tenant context
     if user.tenant_id:
