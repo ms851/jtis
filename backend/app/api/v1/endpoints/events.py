@@ -182,6 +182,7 @@ async def update_event(
         setattr(event, k, v)
     event.updated_by = uuid.UUID(user.id)
     await db.flush()
+    await db.refresh(event)
     return SingleResponse(data=EventRead.model_validate(event))
 
 
@@ -256,4 +257,6 @@ async def set_event_modules(
         new_modules.append(em)
 
     await db.flush()
+    for m in new_modules:
+        await db.refresh(m)
     return [EventModuleRead.model_validate(m) for m in new_modules]

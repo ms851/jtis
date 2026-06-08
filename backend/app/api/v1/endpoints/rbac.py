@@ -198,4 +198,5 @@ async def assign_role(
     )
     db.add(assignment)
     await db.flush()
+    await db.refresh(assignment)
     return UserEventRoleRead.model_validate(assignment)

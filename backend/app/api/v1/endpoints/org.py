@@ -63,6 +63,7 @@ async def update_organization(
         setattr(org, k, v)
     org.updated_by = uuid.UUID(user.id)
     await db.flush()
+    await db.refresh(org)
     return SingleResponse(data=OrganizationRead.model_validate(org))
 
 
@@ -137,6 +138,7 @@ async def invite_member(
     )
     db.add(member)
     await db.flush()
+    await db.refresh(member)
     return OrgMemberRead.model_validate(member)
 
 
@@ -161,6 +163,7 @@ async def update_member_role(
         raise HTTPException(404, "Member not found")
     member.role = role
     await db.flush()
+    await db.refresh(member)
     return OrgMemberRead.model_validate(member)
 
 

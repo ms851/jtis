@@ -114,6 +114,7 @@ async def grant_consent(
     )
     db.add(consent)
     await db.flush()
+    await db.refresh(consent)
     return ConsentRead.model_validate(consent)
 
 
