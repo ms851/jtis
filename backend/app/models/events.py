@@ -34,8 +34,6 @@ class Event(BaseModel, TenantMixin):
 
     organization: Mapped[Organization] = relationship(  # noqa: F821
         back_populates="events",
-        foreign_keys=[TenantMixin.tenant_id],
-        primaryjoin="Event.tenant_id == Organization.id",
     )
     modules: Mapped[list[EventModule]] = relationship(
         back_populates="event", cascade="all, delete-orphan"
