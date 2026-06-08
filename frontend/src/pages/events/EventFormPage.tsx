@@ -30,6 +30,8 @@ export function EventFormPage() {
     status: 'draft',
   });
   const [activeModules, setActiveModules] = useState<Record<string, boolean>>({});
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isEdit && id) {
@@ -54,22 +56,32 @@ export function EventFormPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const modules = Object.entries(activeModules)
-      .filter(([_, active]) => active)
-      .map(([key]) => ({ module_key: key, is_active: true }));
+    setSaving(true);
+    setError(null);
+    try {
+      const modules = Object.entries(activeModules)
+        .filter(([_, active]) => active)
+        .map(([key]) => ({ module_key: key, is_active: true }));
 
-    if (isEdit && id) {
-      await eventsApi.update(id, form);
-      await eventsApi.setModules(id, modules);
-    } else {
-      await eventsApi.create({ ...form, modules });
+      if (isEdit && id) {
+        await eventsApi.update(id, form);
+        await eventsApi.setModules(id, modules);
+      } else {
+        await eventsApi.create({ ...form, modules });
+      }
+      navigate('/events');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Fehler beim Speichern';
+      setError(msg);
+    } finally {
+      setSaving(false);
     }
-    navigate('/events');
   };
 
   return (
     <Container className="py-4">
       <h2>{isEdit ? t('events.edit') : t('events.create')}</h2>
+      {error && <div className="alert alert-danger" role="alert">{error}</div>}
       <Form onSubmit={handleSubmit}>
         <Row>
           <Col md={8}>
@@ -159,8 +171,8 @@ export function EventFormPage() {
           </Col>
         </Row>
         <div className="mt-3">
-          <Button type="submit" variant="primary" className="me-2">
-            {t('common.save')}
+          <Button type="submit" variant="primary" className="me-2" disabled={saving}>
+            {saving ? t('common.loading', 'Speichern...') : t('common.save')}
           </Button>
           <Button variant="secondary" onClick={() => navigate('/events')}>
             {t('common.cancel')}

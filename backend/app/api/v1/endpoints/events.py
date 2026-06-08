@@ -162,7 +162,7 @@ async def update_event(
 
     # Validate status transitions
     update_data = body.model_dump(exclude_unset=True)
-    if "status" in update_data:
+    if "status" in update_data and update_data["status"] != event.status:
         valid_transitions = {
             "draft": {"active"},
             "active": {"completed"},
