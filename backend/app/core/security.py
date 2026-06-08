@@ -14,6 +14,25 @@ settings = get_settings()
 bearer_scheme = HTTPBearer(auto_error=False)
 
 _jwks_cache: dict | None = None
+_oidc_issuer_cache: str | None = None
+
+
+async def _get_oidc_issuer() -> str | None:
+    """Fetch the issuer from Keycloak's OpenID Connect discovery endpoint."""
+    global _oidc_issuer_cache
+    if _oidc_issuer_cache is None:
+        url = (
+            f"{settings.keycloak_url}/realms/"
+            f"{settings.keycloak_realm}/.well-known/openid-configuration"
+        )
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                resp = await client.get(url)
+                resp.raise_for_status()
+                _oidc_issuer_cache = resp.json().get("issuer")
+        except Exception:
+            pass
+    return _oidc_issuer_cache
 
 
 async def _get_jwks() -> dict:
@@ -31,8 +50,9 @@ async def _get_jwks() -> dict:
 
 
 def invalidate_jwks_cache() -> None:
-    global _jwks_cache
+    global _jwks_cache, _oidc_issuer_cache
     _jwks_cache = None
+    _oidc_issuer_cache = None
 
 
 async def decode_token(token: str) -> dict:
@@ -66,14 +86,29 @@ async def decode_token(token: str) -> dict:
             detail="Unable to find matching key",
         )
 
-    # Build list of accepted issuers (internal Docker URL + external hostname)
-    accepted_issuers = [
-        f"{settings.keycloak_url}/realms/{settings.keycloak_realm}",
-    ]
+    # Build list of accepted issuers:
+    # 1. Dynamically discovered issuer from Keycloak's OIDC config (matches token)
+    # 2. Internal Docker URL as fallback
+    # 3. External hostname-based URL if configured
+    accepted_issuers: list[str] = []
+
+    # Discover the issuer Keycloak advertises (this is what tokens contain)
+    discovered_issuer = await _get_oidc_issuer()
+    if discovered_issuer:
+        accepted_issuers.append(discovered_issuer)
+
+    # Always include the internal Docker URL
+    internal_issuer = f"{settings.keycloak_url}/realms/{settings.keycloak_realm}"
+    if internal_issuer not in accepted_issuers:
+        accepted_issuers.append(internal_issuer)
+
+    # Include external hostname if configured
     if hasattr(settings, 'keycloak_hostname') and settings.keycloak_hostname:
-        accepted_issuers.append(
+        hostname_issuer = (
             f"http://{settings.keycloak_hostname}/realms/{settings.keycloak_realm}"
         )
+        if hostname_issuer not in accepted_issuers:
+            accepted_issuers.append(hostname_issuer)
 
     # Build list of accepted audiences
     accepted_audiences = [settings.keycloak_client_id, "account"]
